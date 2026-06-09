@@ -1,0 +1,49 @@
+# Files that should NOT end up in the production image.
+# Mirrors .gitignore for source-control concerns and adds a few
+# build-time / dev-time exclusions.
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+
+# CI / editor state
+.github/
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+
+# Python caches & build artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtualenvs
+.venv/
+venv/
+env/
+
+# Tests and dev docs
+tests/
+RENDER.md
+DEPLOY*.md
+*.log
+.env
+.env.local
+.env.*.local
+
+# OS / local data
+*.db
+*.sqlite
+*.sqlite3
+.history/

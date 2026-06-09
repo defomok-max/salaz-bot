@@ -1,0 +1,13 @@
+# Runtime dependencies for the Instagram Dork Bot.
+# Render uses this file (or pyproject.toml, both work) when building
+# the service. Pin only lower bounds so security patches are picked up;
+# upper bounds are tested in CI via the `dev` extra in pyproject.toml.
+
+aiogram>=3.4.0,<4
+aiohttp>=3.9.0
+aiosqlite>=0.20.0
+httpx>=0.27.0
+pydantic>=2.6.0
+pydantic-settings>=2.2.0
+python-dotenv>=1.0.0
+phonenumbers>=8.13.0

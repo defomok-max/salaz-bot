@@ -1,0 +1,62 @@
+# Render Blueprint — declarative definition of the bot service.
+#
+# How to deploy:
+#   1. Push this repo to GitHub.
+#   2. Sign in to https://dashboard.render.com/blueprints.
+#   3. New → Blueprint → point at the repo → Apply.
+#   4. Open the created service → Environment → set:
+#        TELEGRAM_BOT_TOKEN=<token from @BotFather>
+#        SERPER_API_KEY=<key from https://serper.dev>
+#      (or use sync:false on envVars below and fill them in the UI)
+#   5. Wait for the first deploy. The /health endpoint will be probed
+#      automatically; once it returns 200, the bot is polling.
+#
+# Documentation: https://docs.render.com/blueprint-spec
+
+services:
+  - type: web
+    name: instagram-dork-bot
+    runtime: python
+    plan: starter
+    region: oregon
+    branch: main
+    # Build & start.
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: python -m instagram_dork_bot
+    # Health check: hit our aiohttp server. Render re-issues the request
+    # every 30s by default and restarts the container after 3 failures.
+    healthCheckPath: /health
+    autoDeploy: true
+    # Persistent disk for the SQLite history DB. Mounted at /var/data
+    # so the bot's config can default there. Persistent disks are
+    # only available on paid plans (starter+).
+    disk:
+      name: history-db
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.10
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: PORT
+        value: "10000"
+      - key: HISTORY_DB_PATH
+        value: /var/data/history.db
+      - key: LOG_LEVEL
+        value: INFO
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: SERPER_API_KEY
+        sync: false
+      - key: ADMIN_USER_IDS
+        sync: false
+        # REQUIRED on first deploy: CSV of Telegram user IDs to promote to
+        # admin on first /start. Without this, the bot refuses to auto-promote
+        # any user (intentional — prevents open relay on Free plan where
+        # persistent disk is unavailable and the DB is wiped on every redeploy).
+        # Find your own ID via @userinfobot on Telegram.
+      - key: ALLOWED_USER_IDS
+        sync: false
+        # Optional: CSV of Telegram user IDs that bypass the admin-approval
+        # gate. Empty = every user must be approved by an admin.
